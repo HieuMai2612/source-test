@@ -1,14 +1,34 @@
 import React from 'react';
-import DialogPopup from './components/DialogPopup/dialogPopup';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import StartGame from './components/StartGame/startGame';
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes
+} from "react-router-dom";
 import './App.css';
+import AddPlayer from './components/AddPlayer/addPlayer';
+import TablePlayer from './components/TablePlayer/tablePlayer';
+import GamePlay from './components/GamePlay/gamePlay';
+import History from './components/History/history';
+
 
 function App() {
+
+
   return (
     <div className="App">
       <header className="App-header">
-        <div>Hello this is Duke</div>
-        <div>Please click below for more </div>
-        <DialogPopup></DialogPopup>
+
+        <Router>
+          <Routes>
+            <Route path="/" element={<StartGame />} />
+            <Route path="/addplayer" element={<AddPlayer />} />
+            <Route path="/list-players" element={<TablePlayer />} />
+            <Route path="/game-play" element={<GamePlay />} />
+            <Route path="/history" element={<History />} />
+          </Routes>
+        </Router>
       </header>
     </div>
   );
