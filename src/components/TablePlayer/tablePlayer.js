@@ -20,6 +20,7 @@ const TablePlayer = () => {
 
     const handleNameChange = (event) => {
         setName(event.target.value);
+        setId(event.target.value)
     }
 
     const handleSubmit = (event) => {
@@ -27,6 +28,7 @@ const TablePlayer = () => {
         dispatch(playerAdded(id, name));
         setName('');
         setShow(false);
+
     };
 
     const handleClose = () => {

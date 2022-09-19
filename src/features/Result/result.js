@@ -11,13 +11,15 @@ const resultSlice = createSlice({
             reducer(state, action) {
                 state.push(action.payload);
             },
-            prepare(match, question, answer, result) {
+            prepare(match, name, answer, result, quesCount, playerCount) {
                 return {
                     payload: {
                         match,
-                        question,
+                        name,
                         answer,
                         result,
+                        quesCount,
+                        playerCount,
                     }
                 }
             }
@@ -26,4 +28,5 @@ const resultSlice = createSlice({
 })
 
 export const { playerResult } = resultSlice.actions;
+export const selectAllResult = (state) => state.result;
 export default resultSlice.reducer;

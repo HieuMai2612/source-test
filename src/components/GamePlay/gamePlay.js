@@ -3,51 +3,96 @@ import './gamePlay.scss';
 import { useDispatch, useSelector } from 'react-redux'
 import { useState, useEffect } from 'react';
 import { selectAllQuestion } from '../../features/QuestionSlice/questionSlice';
+import { selectAllPlayers } from '../../features/PlayerSlice/playerSlice';
+import { selectAllResult } from '../../features/Result/result';
 import { playerResult } from '../../features/Result/result';
 import { Link } from 'react-router-dom';
+import axios from '../../api/Api';
 const GamePlay = () => {
     const playerData = useSelector(state => state.player);
+    const players = useSelector(selectAllPlayers);
+    const results = useSelector(selectAllResult);
 
     const [indexName, setIndexName] = useState(0);
-    const [indexQuest, setIndexQuest] = useState(0);
-    const [checkAnswer, setCheckAnswer] = useState('');
-    const [result, setResult] = useState(0);
+
+    const [playerCount, setPlayerCount] = useState(playerResult[playerResult.length - 1]?.playerCount || 0);
+    const [questionNum, setQuestionNum] = useState(playerResult[playerResult.length - 1]?.match || 1);
     const [showBtn, setShowBtn] = useState(true);
     const [answer, setAnswer] = useState('');
+    const [apiAnswer, setApiAnswer] = useState('');
+    const [checkAnswer, setCheckAnswer] = useState('');
+    const [result, setResult] = useState('');
+
+    const [image, setImage] = useState();
+    //show btn when clicked
+    const [showEnd, setShowEnd] = useState(false);
+    const [isDisable, setIsDisable] = useState(true);
 
     const dispatch = useDispatch();
     const questions = useSelector(selectAllQuestion);
 
-    useEffect(() => {
+    const onClickSubmit = () => {
+        dispatch(playerResult(questions[indexName]?.match, playerData[indexName]?.name, answer, checkAnswer, questionNum, playerCount + 1));
 
-    },)
+        console.log("api", apiAnswer, "//", answer)
 
-
-    const onChangeSubmit = () => {
-        dispatch(playerResult(playerData[indexName]?.name, questions[indexName]?.match, checkAnswer));
         setTimeout(() => {
             setResult(checkAnswer);
             setShowBtn(false);
-        }, 3000);
-        if (questions[indexName]?.answer === checkAnswer) {
-            setAnswer('yes');
-        } else {
-            setAnswer('no');
-        }
+            if (questionNum === 2 && playerCount + 1 === players.length) {
+                setShowEnd(true);
+                setQuestionNum(0);
+                setResult('');
+            }
+        }, 1000);
     }
 
     const onClickYes = () => {
-        setCheckAnswer('yes');
+        setAnswer('yes');
+        setIsDisable(false);
     }
 
     const onClickNo = () => {
-        setCheckAnswer('no');
-        console.log("no");
+        setAnswer('no');
+        setIsDisable(false);
     }
 
     const onNextPlayer = () => {
-        dispatch(playerResult(playerData[indexName]?.name + 1, questions[indexName]?.match + 1, checkAnswer + 1));
+        setShowBtn(true);
+        setResult('');
+        setAnswer('');
+        setPlayerCount(playerCount + 1);
+        setIsDisable(true);
     }
+
+    // useEffect(() => {
+    //     if (playerCount === players.length) {
+    //         setQuestionNum(questionNum + 1);
+    //         dispatch(playerResult(null, null, null, null, questionNum + 1));
+    //         setPlayerCount(0);
+    //     }
+    // }, [showBtn]);
+
+    useEffect(() => {
+        if (playerCount === players.length) {
+            setQuestionNum(questionNum + 1);
+            dispatch(playerResult(null, null, null, null, questionNum + 1));
+            setPlayerCount(0);
+        }
+    }, [showBtn]);
+
+    useEffect(() => {
+        axios.getImage().then((response) => {
+            setImage(response.image);
+            setApiAnswer(response.answer);
+        });
+    }, [showBtn]);
+
+    useEffect(() => {
+        apiAnswer === answer ? setCheckAnswer('yes') : setCheckAnswer('no');
+    }, [answer]);
+
+
 
     return (
         <div className='game-container'>
@@ -61,35 +106,43 @@ const GamePlay = () => {
             <div className='game-body'>
                 <div className='game-body-title'>
                     <div className='game-body-match'>
-                        Match {questions[indexName]?.match}
+                        Match {questionNum}
                     </div>
-                    <div>
-                        Question: {questions[indexName]?.question}
-                    </div>
+
                     <div className='player-name'>
-                        Player: <div className='player-name-change'>{playerData[indexName]?.name}</div>
+                        Player: <div className='player-name-change'>{playerData[playerCount]?.name}</div>
                     </div>
                 </div>
 
                 <div className='game-body-choose'>
                     <Button onClick={onClickYes} className='btn-yes' variant="outline-dark">YES</Button>
                     <div className='result-message'>
-                        {answer === 'yes' && <div>Correct</div>}
-                        {answer === 'no' && <div>Incorrect</div>}
+                        {result === 'yes' && <div>Correct</div>}
+                        {result === 'no' && <div>Incorrect</div>}
                     </div>
                     <Button onClick={onClickNo} className='btn-no' variant="outline-dark">NO</Button>
 
                 </div>
+
+                {result.length > 0 && (
+                    <div>
+                        <img className="game-image" src={image} alt="" />
+                    </div>
+                )}
             </div>
 
             <div className='game-footer'>
-                <Button variant="outline-light" className='btn-submit' onClick={onChangeSubmit}>
-                    Submit
-                </Button>
-                <Button variant="outline-light" className='btn-submit' onClick={onNextPlayer} >
-                    Next Player
-                </Button>
-                <Button variant="primary" className='btn-loading invisible' disabled>
+
+                {showBtn && !showEnd &&
+                    <Button onClick={onClickSubmit} disabled={isDisable} className='btn-submit' variant="outline-dark" >Submit</Button>
+                }
+                {!showBtn && !showEnd &&
+                    <Button variant="outline-light" className='btn-submit' onClick={onNextPlayer}  >
+                        {playerCount + 1 === players.length ? "Next game" : "Next player"}
+                    </Button>
+                }
+
+                {/* <Button variant="primary" className='btn-loading ' disabled>
                     <Spinner
                         as="span"
                         animation="border"
@@ -98,11 +151,19 @@ const GamePlay = () => {
                         aria-hidden="true"
                     />
                     <span>Loading...</span>
-                </Button>
-
-                <Button variant="outline-dark" className='btn-result invisible'>
-                    ViewResult
-                </Button>
+                </Button> */}
+                {showEnd &&
+                    <Link to="/history">
+                        <Button variant="outline-dark" className='btn-result '>
+                            ViewResult
+                        </Button>
+                    </Link>
+                }
+                {showEnd &&
+                    <div>
+                        This game has finished
+                    </div>
+                }
             </div>
         </div>
     );

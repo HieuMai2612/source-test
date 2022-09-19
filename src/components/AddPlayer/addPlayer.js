@@ -11,25 +11,27 @@ const AddPlayer = () => {
     const navigate = useNavigate();
     const [show, setShow] = useState(false);
     const [name, setName] = useState('');
+    const [id, setId] = useState('');
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     const dispatch = useDispatch();
+
     const handleChange = (event) => {
         setName(event.target.value);
     }
 
-
-
     const handleAdd = (e) => {
         e.preventDefault();
-        dispatch(playerAdded(name));
+        dispatch(playerAdded(id + 1, name));
         setName('');
         setShow(false);
+        setId(id + 1);
         setTimeout(() => {
             navigate("../list-players", { replace: true });
         }, 500)
-
     };
+
+
 
 
 

@@ -5,13 +5,41 @@ import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
 import { selectAllQuestion } from '../../features/QuestionSlice/questionSlice';
+import { selectAllResult } from '../../features/Result/result';
+import { playerResult } from '../../features/Result/result';
 
 const History = () => {
 
     const [indexName, setIndexName] = useState(0);
+    const result = useSelector(selectAllResult);
+    const [text, setText] = useState('');
+
+    const [questionNum, setQuestionNum] = useState(playerResult[playerResult.length - 1]?.match || 1);
+
 
     const dispatch = useDispatch();
     const questions = useSelector(selectAllQuestion);
+    const matchResult = result.filter((match) => {
+        if (match.match === questionNum) {
+            return match;
+        }
+    });
+    const search = matchResult.filter((item) => item?.name?.includes(text));
+    const tableItem = search.map((result, index) => {
+        return (
+            <tr key={index}>
+                <td>{index}</td>
+                <td>{result?.name}</td>
+                <td>00/11/2000</td>
+                <td>{result?.answer}</td>
+                <td>{result?.result}</td>
+                <td>{result?.result === 'yes' ? '1' : '0'}</td>
+            </tr>
+        );
+
+    });
+
+
 
     return (
         <>
@@ -41,21 +69,7 @@ const History = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>No</td>
-                        <td>No</td>
-                        <td>1</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-
-                    </tr>
-
+                    {tableItem}
                 </tbody>
                 <thead>
                     <tr>

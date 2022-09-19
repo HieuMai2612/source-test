@@ -12,7 +12,6 @@ const PlayerSlice = createSlice({
             },
             prepare(id, name) {
                 return {
-
                     payload: {
                         id: 1,
                         name,
@@ -25,4 +24,5 @@ const PlayerSlice = createSlice({
 })
 
 export const { playerAdded } = PlayerSlice.actions;
+export const selectAllPlayers = (state) => state.player;
 export default PlayerSlice.reducer;
