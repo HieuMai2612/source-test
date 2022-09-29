@@ -4,19 +4,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useState, useEffect } from 'react';
 import { selectAllQuestion } from '../../features/QuestionSlice/questionSlice';
 import { selectAllPlayers } from '../../features/PlayerSlice/playerSlice';
-import { selectAllResult } from '../../features/Result/result';
 import { playerResult } from '../../features/Result/result';
 import { Link } from 'react-router-dom';
 import axios from '../../api/Api';
 const GamePlay = () => {
-    const playerData = useSelector(state => state.player);
     const players = useSelector(selectAllPlayers);
-    const results = useSelector(selectAllResult);
 
-    const [indexName, setIndexName] = useState(0);
 
     const [playerCount, setPlayerCount] = useState(playerResult[playerResult.length - 1]?.playerCount || 0);
-    const [questionNum, setQuestionNum] = useState(playerResult[playerResult.length - 1]?.match || 1);
+    const [questionNum, setQuestionNum] = useState(playerResult[playerResult.length - 1]?.matchId || 1);
     const [showBtn, setShowBtn] = useState(true);
     const [answer, setAnswer] = useState('');
     const [apiAnswer, setApiAnswer] = useState('');
@@ -29,16 +25,13 @@ const GamePlay = () => {
     const [isDisable, setIsDisable] = useState(true);
 
     const dispatch = useDispatch();
-    const questions = useSelector(selectAllQuestion);
 
     const onClickSubmit = () => {
-        dispatch(playerResult(questions[indexName]?.match, playerData[indexName]?.name, answer, checkAnswer, questionNum, playerCount + 1));
-
+        dispatch(playerResult(questionNum, players[playerCount]?.name, answer, checkAnswer, playerCount + 1));
         console.log("api", apiAnswer, "//", answer)
-
+        setResult(checkAnswer);
+        setShowBtn(false);
         setTimeout(() => {
-            setResult(checkAnswer);
-            setShowBtn(false);
             if (questionNum === 2 && playerCount + 1 === players.length) {
                 setShowEnd(true);
                 setQuestionNum(0);
@@ -46,7 +39,6 @@ const GamePlay = () => {
             }
         }, 1000);
     }
-
     const onClickYes = () => {
         setAnswer('yes');
         setIsDisable(false);
@@ -63,19 +55,12 @@ const GamePlay = () => {
         setAnswer('');
         setPlayerCount(playerCount + 1);
         setIsDisable(true);
+
+
     }
-
-    // useEffect(() => {
-    //     if (playerCount === players.length) {
-    //         setQuestionNum(questionNum + 1);
-    //         dispatch(playerResult(null, null, null, null, questionNum + 1));
-    //         setPlayerCount(0);
-    //     }
-    // }, [showBtn]);
-
     useEffect(() => {
         if (playerCount === players.length) {
-            setQuestionNum(questionNum + 1);
+            setQuestionNum(questionNum => questionNum + 1);
             dispatch(playerResult(null, null, null, null, questionNum + 1));
             setPlayerCount(0);
         }
@@ -91,7 +76,6 @@ const GamePlay = () => {
     useEffect(() => {
         apiAnswer === answer ? setCheckAnswer('yes') : setCheckAnswer('no');
     }, [answer]);
-
 
 
     return (
@@ -110,7 +94,7 @@ const GamePlay = () => {
                     </div>
 
                     <div className='player-name'>
-                        Player: <div className='player-name-change'>{playerData[playerCount]?.name}</div>
+                        Player: <div className='player-name-change'>{players[playerCount]?.name}</div>
                     </div>
                 </div>
 
@@ -142,16 +126,14 @@ const GamePlay = () => {
                     </Button>
                 }
 
-                {/* <Button variant="primary" className='btn-loading ' disabled>
-                    <Spinner
+                {/* <Spinner
                         as="span"
                         animation="border"
                         size="sm"
                         role="status"
                         aria-hidden="true"
-                    />
-                    <span>Loading...</span>
-                </Button> */}
+                    /> */}
+
                 {showEnd &&
                     <Link to="/history">
                         <Button variant="outline-dark" className='btn-result '>

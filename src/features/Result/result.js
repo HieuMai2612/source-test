@@ -11,15 +11,15 @@ const resultSlice = createSlice({
             reducer(state, action) {
                 state.push(action.payload);
             },
-            prepare(match, name, answer, result, quesCount, playerCount) {
+            prepare(matchId, name, answer, result, playerCount) {
                 return {
                     payload: {
-                        match,
+                        matchId,
                         name,
                         answer,
                         result,
-                        quesCount,
                         playerCount,
+                        date: new Date().toISOString(),
                     }
                 }
             }

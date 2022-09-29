@@ -2,43 +2,67 @@ import './history.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Table, Button, Form } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useState } from 'react';
-import { selectAllQuestion } from '../../features/QuestionSlice/questionSlice';
 import { selectAllResult } from '../../features/Result/result';
-import { playerResult } from '../../features/Result/result';
 
 const History = () => {
 
-    const [indexName, setIndexName] = useState(0);
-    const result = useSelector(selectAllResult);
+    const results = useSelector(selectAllResult);
     const [text, setText] = useState('');
 
-    const [questionNum, setQuestionNum] = useState(playerResult[playerResult.length - 1]?.match || 1);
+    const [questionNum, setQuestionNum] = useState(results[results.length - 1]?.matchId || 0);
+    console.log(results[results.length - 1])
 
+    console.log("ee", questionNum)
+    // const dispatch = useDispatch();
 
-    const dispatch = useDispatch();
-    const questions = useSelector(selectAllQuestion);
-    const matchResult = result.filter((match) => {
-        if (match.match === questionNum) {
+    const coverDate = (item) => {
+        const date = new Date();
+        const dateAt = ` ${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+        return dateAt;
+    };
+
+    const matchResult = results.filter((match) => {
+        if (match.matchId === questionNum) {
             return match;
         }
     });
+
     const search = matchResult.filter((item) => item?.name?.includes(text));
-    const tableItem = search.map((result, index) => {
+
+    const tableItem = search.map((results, index) => {
         return (
             <tr key={index}>
                 <td>{index}</td>
-                <td>{result?.name}</td>
-                <td>00/11/2000</td>
-                <td>{result?.answer}</td>
-                <td>{result?.result}</td>
-                <td>{result?.result === 'yes' ? '1' : '0'}</td>
+                <td>{results?.name}</td>
+                <td>{coverDate(results?.date)}</td>
+                <td>{results?.answer}</td>
+                <td>{results?.result}</td>
+                <td>{results?.result === 'yes' ? '1' : '0'}</td>
             </tr>
         );
 
     });
+    const itemTable = search.map((results, index) => {
+        return (
+            <tr key={index}>
+                <td>{index}</td>
+                <td>{results?.name}</td>
+                <td>{coverDate(results?.date)}</td>
+                <td>{results?.answer}</td>
+                <td>{results?.result}</td>
+                <td>{results?.result === 'yes' ? '1' : '0'}</td>
+            </tr>
+        );
+    });
 
+
+
+    console.log(results)
+    const onChangeSearch = (e) => {
+        setText(e.target.value);
+    }
 
 
     return (
@@ -50,12 +74,13 @@ const History = () => {
                 </Link>
             </div>
             <div className='game-body-match'>
-                Match {questions[indexName]?.match}
+                Match {questionNum}
             </div>
             <Form.Control
                 type="text"
                 name="name"
                 className="history-search"
+                onChange={onChangeSearch}
             />
             <Table striped bordered hover>
                 <thead>
@@ -67,9 +92,10 @@ const History = () => {
                         <th>Result</th>
                         <th>Score</th>
                     </tr>
+
                 </thead>
                 <tbody>
-                    {tableItem}
+                    {itemTable}
                 </tbody>
                 <thead>
                     <tr>
@@ -90,7 +116,6 @@ const History = () => {
                         <td>Hennry</td>
                         <td>100%</td>
                         <td>1</td>
-
                     </tr>
 
                 </tbody>
