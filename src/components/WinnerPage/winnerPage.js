@@ -1,4 +1,4 @@
-import './history.scss';
+import './winnerPage.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Table, Button, Form } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { selectAllResult } from '../../features/Result/result';
 import { selectAllPlayers } from '../../features/PlayerSlice/playerSlice';
 
-const History = () => {
+const WinnerPage = () => {
 
     const results = useSelector(selectAllResult);
     const players = useSelector(selectAllPlayers);
@@ -71,6 +71,18 @@ const History = () => {
         );
     });
 
+    // get winner of the game
+    const winner = players.map((results) => {
+        return {
+            name: results.name,
+            point: getSummary(results.name),
+        };
+    });
+    console.log("winer", winner)
+    const gameWinner = Math.max(...winner.map((results) => results.point));
+    const winGame = winner.filter((results) => results.point === gameWinner);
+    console.log("winerwww", winGame)
+
 
     return (
         <>
@@ -116,9 +128,16 @@ const History = () => {
                     {playerName}
                 </tbody>
             </Table>
+
+            <div>The winner is: {winGame[0].name}</div>
+            <div>
+                <Link to="/">
+                    <Button className='end-btn' variant="outline-dark">End game</Button>
+                </Link>
+            </div>
         </>
     )
 }
 
 
-export default History
+export default WinnerPage

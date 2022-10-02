@@ -135,7 +135,7 @@ const GamePlay = () => {
                     /> */}
 
                 {showEnd &&
-                    <Link to="/history">
+                    <Link to="/winpage">
                         <Button variant="outline-dark" className='btn-result '>
                             ViewResult
                         </Button>
