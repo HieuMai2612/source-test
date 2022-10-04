@@ -2,7 +2,6 @@ import { Button, Spinner } from 'react-bootstrap';
 import './gamePlay.scss';
 import { useDispatch, useSelector } from 'react-redux'
 import { useState, useEffect } from 'react';
-import { selectAllQuestion } from '../../features/QuestionSlice/questionSlice';
 import { selectAllPlayers } from '../../features/PlayerSlice/playerSlice';
 import { playerResult } from '../../features/Result/result';
 import { Link } from 'react-router-dom';

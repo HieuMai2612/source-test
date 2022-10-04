@@ -13,7 +13,7 @@ const PlayerSlice = createSlice({
             prepare(id, name) {
                 return {
                     payload: {
-                        id: 0,
+                        id: 1,
                         name,
 
                     }
